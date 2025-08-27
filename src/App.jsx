@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, TouchableWithoutFeedback, Dimensions, TouchableOpacity } from "react-native";
-import Svg, { Circle } from "react-native-svg";
 
-const { width, height } = Dimensions.get("window");
+const { innerWidth: width, innerHeight: height } = window;
 
 export default function App() {
   const [bubbles, setBubbles] = useState([]);
@@ -34,7 +32,6 @@ export default function App() {
     const move = setInterval(() => {
       setBubbles((prev) => {
         const updated = prev.map((b) => ({ ...b, y: b.y - speed }));
-        // Si se escapa una burbuja => game over
         const escaped = updated.some((b) => b.y <= -50);
         if (escaped) {
           setGameOver(true);
@@ -68,87 +65,84 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
+    <div style={styles.container}>
       {gameOver ? (
-        <View style={styles.center}>
-          <Text style={styles.gameOver}>¡Juego Terminado!</Text>
-          <Text style={styles.finalScore}>Puntaje: {score}</Text>
-          <TouchableOpacity style={styles.button} onPress={restartGame}>
-            <Text style={styles.buttonText}>Reiniciar</Text>
-          </TouchableOpacity>
-        </View>
+        <div style={styles.center}>
+          <h1 style={styles.gameOver}>¡Juego Terminado!</h1>
+          <h2 style={styles.finalScore}>Puntaje: {score}</h2>
+          <button style={styles.button} onClick={restartGame}>
+            Reiniciar
+          </button>
+        </div>
       ) : (
         <>
-          <Text style={styles.score}>Puntos: {score}</Text>
+          <h2 style={styles.score}>Puntos: {score}</h2>
           {bubbles.map((bubble) => (
-            <TouchableWithoutFeedback
+            <div
               key={bubble.id}
-              onPress={() => popBubble(bubble.id)}
-            >
-              <Svg
-                height="60"
-                width="60"
-                style={{
-                  position: "absolute",
-                  top: bubble.y,
-                  left: bubble.x,
-                }}
-              >
-                <Circle
-                  cx="30"
-                  cy="30"
-                  r={bubble.r}
-                  fill="rgba(0, 150, 255, 0.6)"
-                  stroke="white"
-                  strokeWidth="2"
-                />
-              </Svg>
-            </TouchableWithoutFeedback>
+              onClick={() => popBubble(bubble.id)}
+              style={{
+                ...styles.bubble,
+                top: bubble.y,
+                left: bubble.x,
+                width: bubble.r * 2,
+                height: bubble.r * 2,
+              }}
+            />
           ))}
         </>
       )}
-    </View>
+    </div>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
-    flex: 1,
+    position: "relative",
+    width: "100vw",
+    height: "100vh",
     backgroundColor: "#222",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    overflow: "hidden",
   },
   center: {
-    flex: 1,
+    display: "flex",
+    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
+    height: "100%",
   },
   score: {
-    fontSize: 24,
+    fontSize: "24px",
     color: "#fff",
-    marginTop: 50,
+    margin: "20px",
     fontWeight: "bold",
   },
   gameOver: {
-    fontSize: 32,
+    fontSize: "32px",
     color: "red",
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: "20px",
   },
   finalScore: {
-    fontSize: 24,
+    fontSize: "24px",
     color: "#fff",
-    marginBottom: 30,
+    marginBottom: "30px",
   },
   button: {
     backgroundColor: "#0af",
-    paddingHorizontal: 30,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  buttonText: {
-    fontSize: 20,
+    padding: "12px 30px",
+    borderRadius: "12px",
+    border: "none",
     color: "#fff",
+    fontSize: "20px",
     fontWeight: "bold",
+    cursor: "pointer",
   },
-});
+  bubble: {
+    position: "absolute",
+    borderRadius: "50%",
+    backgroundColor: "rgba(0, 150, 255, 0.6)",
+    border: "2px solid white",
+    cursor: "pointer",
+  },
+};
